@@ -162,6 +162,7 @@ void delete_role(Role* root_role)
 }
 void add_users()
 {
+
 	string user_name,role_name;
 	cout << "\nEnter User Name : ";
 	getline(cin,user_name);
@@ -188,9 +189,15 @@ void displayUsers2(Role* root_role)
 		Role* temp = queue_node.front();
 
 		
-
+		int n = 0;
 		for(auto it:temp->users)
-			cout << it << " ";
+		{
+			cout << it ;
+
+
+			if(n!=temp->users.size())
+						cout << " , ";
+		}
 
 		//cout << temp->role_name << " - ";
 		queue_node.pop();
@@ -212,20 +219,29 @@ void displayUsersAndSubRoles(Role* root_role)
 		Role* temp = queue_node.front();
 
 
+		int n = 0;
+
 		for(auto it:temp->users)
 		{
-			cout << it << ",";
+			cout << it;
+			
+			if(n++!=temp->users.size())
+						cout << " - ";
 		}
 		
-		cout << " - ";
 		
 
 		queue_node.pop();
 
 		for(auto children:temp->children_roles)
 		{	
+			displayUsers2(children.second);
 			queue_node.push(children.second);
 		}
+
+		if(temp->users.size() !=0)	cout  << endl;
+	
+
 	}
 
 }
@@ -240,13 +256,19 @@ void displayUsers(Role* root_role)
 		Role* temp = queue_node.front();
 
 		
-
+		int i =0;
+		int n = temp->users.size();
 		for(auto it:temp->users)
 		{
-			cout << it << " ";
-			if(temp->users.size()!=1 ) cout << ",";
+			cout << it;
+			if(++i!=n) cout << ",";
 		}
-		cout <<" - " <<  temp->role_name <<endl ; 
+
+		if(n) cout << " - ";
+		else{
+			cout << "NA" << " - ";
+		}
+		cout << temp->role_name << endl ;
 		queue_node.pop();
 
 		for(auto children:temp->children_roles)
@@ -266,15 +288,21 @@ void delete_users(Role* root_role)
 	// 4. thats it
 
 	// 1.
-	cout << user_name_tobe_deleted << endl;
+	//cout << user_name_tobe_deleted << endl;
 	string role_name = userToRole[user_name_tobe_deleted];
 
 	// 2.
 	if(!checker(role_name)) return;
 	auto it = directory.find(role_name);
+	//cout << role_name << user_name_tobe_deleted <<  endl;
 	Role* temp = it->second;		 
+	//cout << temp->users[0] << endl;
 
-	//auto it2 = temp->users.find(temp->users.begin(), temp->users.end(),user_name_tobe_deleted);
+	auto iter = std::find(temp->users.begin(), temp->users.end(), user_name_tobe_deleted);
+    temp->users.erase(iter);
+
+
+
 
 }
 void solve ()
@@ -291,9 +319,10 @@ void solve ()
 	{	string choice;
 		
 		// choice 1 - add sub role
-		cout << "\nOperations:\n\t1.Add Sub Role.\n\t2.Display\n\t3.Delete Role\n\t4.Add users\n\t5.Display Users\n\t9.Quit";
-		cout << "\nOperation to be performed: ";
+		cout << "\nOperations:\n\t1.Add Sub Role.\n\t2.Display\n\t3.Delete Role\n\t4.Add users\n\t5.Display Users\n\t6.Display User an Subusers\n\t7.Delete Users\n\t9.Quit";
+		cout << "\n\nOperation to be performed: ";
 		getline(cin,choice);
+	cout << endl << endl;
 
 		if(choice == "1")
 		{
@@ -318,15 +347,17 @@ void solve ()
 		}
 		else if(choice == "6")
 		{
-			//displayUsersAndSubRoles(root_role);
+			displayUsersAndSubRoles(root_role);
 			//couldnt get it working
 		}
 		else if(choice == "7")
 		{
 			// not working properly
-			//delete_users(root_role);
+			delete_users(root_role);
 		}
 		else if(choice == "9") return;
+	cout << endl << endl;
+
 	}
 	
 
@@ -334,4 +365,8 @@ void solve ()
 	
 	return;
 }
+
+
+
+
 
