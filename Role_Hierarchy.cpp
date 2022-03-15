@@ -1,7 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
+#define int long long
 void solve();
-int main (){solve();return 0;}
+int32_t main (){solve();return 0;}
 //                      TEMPLATE
 //                        ENDS
 //                        HERE
@@ -305,6 +306,120 @@ void delete_users(Role* root_role)
 
 
 }
+int func(Role* root_role,string user_name)
+{
+    int ans = INT_MAX;
+    	for(auto it:root_role->users)
+    		if(it == user_name)
+    	    {
+    	        cout << it << "igot it";
+    			return ans = 1;
+    	    }
+    	
+    	if(root_role->children_roles.size() >=1)
+    		for(auto it:root_role->children_roles)
+    		{
+    			ans = min(ans , func(it.second,user_name) + 1);
+    		}
+    	return ans;
+}
+void getHeight(Role* root_role)
+{
+	string user_name;
+    cout << "Enter user name: " ;
+    getline(cin,user_name);
+    string user_role = userToRole[user_name];
+    if(!checker(user_role)) return;
+
+    auto it = directory.find(user_role);
+    Role* temp = it->second;
+
+    
+ 	int ans = func(root_role,user_name);
+ 	cout << "\n\nNumber of users from top: " << ans ;
+
+}
+int getRoleHierarchyHeight(Role* root_role)
+{
+		int ans = 1;
+//		cout << root_role->children_roles.size() << endl;
+
+    	if(root_role->children_roles.size() >=1)
+    		for(auto it:root_role->children_roles)
+    			ans = max(ans , getRoleHierarchyHeight(it.second) + 1);	
+
+    	return ans;
+}
+void get_common_boss(Role* root_role)
+{	
+	string user1,user2;
+	cout << "Enter user1: ";
+	getline(cin, user1);
+	cout << "\nEnter user2: ";
+	getline(cin, user2);
+
+	// 1. get the rolenode through userToRole mapping and check whether the user really exists
+	// 2. get the node roles through the user names
+
+	auto  it1 = userToRole.find(user1);
+	auto it2 = userToRole.find(user2);
+
+	
+	
+	if(it1->second == "" )
+	{
+		cout << user1 <<  " does not exist." << endl;
+		return;
+	}
+	else if(it2->second == "")
+	{
+		cout << user2 <<  " does not exist." << endl;
+		return;
+	}
+	// 2.
+	
+
+
+	auto i1 = directory.find(it1->second);
+	auto i2 = directory.find(it2->second);
+
+	Role* u1 = i1->second;
+	Role* u2 = i2->second;
+
+	std::vector<string> boss1;
+	std::vector<string> boss2;
+		
+
+	int n = 0;
+
+	while(u1->parent!=NULL)
+	{
+		boss1.push_back(u1->users[0]);
+		u1 = u1->parent;
+	}
+	boss1.push_back(u1->users[0]);
+	while(u2->parent!=NULL)
+	{
+		boss2.push_back(u2->users[0]);
+		u2 = u2->parent;
+	}
+
+	boss2.push_back(u2->users[0]);
+	string ans = "Not found.";
+
+	for(string &item:boss1)
+	{
+		auto it60 = std::find(boss2.begin(), boss2.end(), item) ;
+		if(it60!=boss2.end() and *it60!=user1 and *it60!=user2){
+			ans = item;
+			break;
+		}
+	}
+
+	cout << "\n\nTop most common boss: " << ans << endl;
+
+
+}
 void solve ()
 {
 
@@ -319,7 +434,7 @@ void solve ()
 	{	string choice;
 		
 		// choice 1 - add sub role
-		cout << "\nOperations:\n\t1.Add Sub Role.\n\t2.Display\n\t3.Delete Role\n\t4.Add users\n\t5.Display Users\n\t6.Display User an Subusers\n\t7.Delete Users\n\t9.Quit";
+		cout << "\nOperations:\n\t1.Add Sub Role.\n\t2.Display\n\t3.Delete Role\n\t4.Add users\n\t5.Display Users\n\t6.Display User an Subusers\n\t7.Delete Users\n\t8.Number of users from top\n\t9.Height Of Role Hierarchyy\n\t10.Get Common Boss\n\t12.Quit";
 		cout << "\n\nOperation to be performed: ";
 		getline(cin,choice);
 	cout << endl << endl;
@@ -355,7 +470,21 @@ void solve ()
 			// not working properly
 			delete_users(root_role);
 		}
-		else if(choice == "9") return;
+		else if(choice == "8")
+		{
+			getHeight(root_role);
+		}
+		else if(choice == "9")
+		{
+			cout <<"Height : " <<  getRoleHierarchyHeight(root_role);
+			//return;
+		}
+		else if(choice == "10")
+		{
+
+			get_common_boss(root_role);
+		}
+		else if(choice == "12") return;
 	cout << endl << endl;
 
 	}
@@ -365,8 +494,4 @@ void solve ()
 	
 	return;
 }
-
-
-
-
 
